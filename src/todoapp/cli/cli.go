@@ -9,19 +9,19 @@ import (
 )
 
 type db struct {
-	lists []list
+	lists []list `json:"lists"`
 }
 
 type list struct {
-	id    int
-	name  string
-	tasks []Task
+	id    int    `json:"id"`
+	name  string `json:"name"`
+	tasks []Task `json:"tasks"`
 }
 
 type Task struct {
-	id          int
-	description string
-	complete    bool
+	id       int    `json:"id"`
+	name     string `json:"task"`
+	complete bool   `json:"complete"`
 }
 
 var nextListId = 0
@@ -114,7 +114,7 @@ func viewList(reader *bufio.Reader, list *list) {
 		fmt.Println(list.name)
 		fmt.Println("----------------")
 		for i, task := range list.tasks {
-			fmt.Println(i+1, task.description, task.complete)
+			fmt.Println(i+1, task.name, task.complete)
 		}
 
 		fmt.Println()
@@ -151,7 +151,7 @@ func addTask(reader *bufio.Reader, list *list) {
 		return
 	}
 
-	taskToAdd := Task{description: input, complete: false}
+	taskToAdd := Task{name: input, complete: false}
 
 	list.tasks = append(list.tasks, taskToAdd)
 
@@ -161,7 +161,7 @@ func addTask(reader *bufio.Reader, list *list) {
 func completeTask(reader *bufio.Reader, list *list) {
 	fmt.Println()
 	for i, task := range list.tasks {
-		fmt.Println(i+1, task.description, task.complete)
+		fmt.Println(i+1, task.name, task.complete)
 	}
 	fmt.Println()
 	fmt.Println("Enter task id to complete or press type x to go back")
@@ -189,7 +189,7 @@ func completeTask(reader *bufio.Reader, list *list) {
 func deleteTask(reader *bufio.Reader, list *list) {
 	fmt.Println()
 	for i, task := range list.tasks {
-		fmt.Println(i+1, task.description, task.complete)
+		fmt.Println(i+1, task.name, task.complete)
 	}
 	fmt.Println()
 	fmt.Println("Enter task id to delete or press type x to go back")
