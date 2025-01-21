@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/MatthewArwenLangham/todoapp/store"
+	"github.com/teris-io/shortid"
 )
 
 type ToDoHandler struct {
@@ -22,7 +23,7 @@ func NewToDoHandler(s store.Store) *ToDoHandler {
 
 var (
 	ToDoRe       = regexp.MustCompile(`^/lists/*$`)
-	ToDoReWithID = regexp.MustCompile(`^/lists/[0-9]+$`)
+	ToDoReWithID = regexp.MustCompile(`^/lists/[a-zA-Z0-9]+$`)
 )
 
 func (h *ToDoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -55,12 +56,7 @@ func (h *ToDoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (h *ToDoHandler) ViewList(w http.ResponseWriter, r *http.Request) {
 	id := strings.Split(r.URL.Path, "lists/")[1]
-	idInt, err := strconv.ParseInt(id, 10, 0)
-	if err != nil {
-		w.Write([]byte("Invalid id"))
-	}
-
-	response := fmt.Sprintf("%v\n", h.store.GetList(int(idInt)))
+	response := fmt.Sprintf("%v\n", h.store.GetList(id))
 	w.Write([]byte(response))
 }
 
@@ -72,8 +68,13 @@ func (h *ToDoHandler) ViewLists(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *ToDoHandler) AddList(w http.ResponseWriter, r *http.Request) {
+	id, err := shortid.Generate()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(id)
 	newList := store.List{
-		Id:    len(h.store.GetAllLists()) + 1,
+		Id:    id,
 		Name:  r.FormValue("name"),
 		Tasks: []store.Task{},
 	}
@@ -91,22 +92,14 @@ func (h *ToDoHandler) AddTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := strings.Split(r.URL.Path, "lists/")[1]
-	idInt, err := strconv.ParseInt(id, 10, 0)
-	if err != nil {
-		panic(err)
-	}
 
-	h.store.AddTask(int(idInt), newTask)
+	h.store.AddTask(id, newTask)
 	response := fmt.Sprintf("%v successfully added.\n", newTask)
 	w.Write([]byte(response))
 }
 
 func (h *ToDoHandler) CompleteTask(w http.ResponseWriter, r *http.Request) {
 	listId := strings.Split(r.URL.Path, "lists/")[1]
-	listIdInt, err := strconv.ParseInt(listId, 10, 0)
-	if err != nil {
-		w.Write([]byte("Invalid id"))
-	}
 
 	taskId := r.FormValue("taskId")
 	taskIdInt, err := strconv.ParseInt(taskId, 10, 0)
@@ -120,17 +113,12 @@ func (h *ToDoHandler) CompleteTask(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	h.store.CompleteTask(int(listIdInt), int(taskIdInt), isTaskCompleted)
+	h.store.CompleteTask(listId, int(taskIdInt), isTaskCompleted)
 }
 
 func (h *ToDoHandler) DeleteList(w http.ResponseWriter, r *http.Request) {
 	listId := strings.Split(r.URL.Path, "lists/")[1]
-	listIdInt, err := strconv.ParseInt(listId, 10, 0)
-	if err != nil {
-		w.Write([]byte("Invalid id"))
-	}
-
-	h.store.DeleteList(int(listIdInt))
-	response := fmt.Sprintf("List with ID %v successfully removed.\n", listIdInt)
+	h.store.DeleteList(listId)
+	response := fmt.Sprintf("List with ID %v successfully removed.\n", listId)
 	w.Write([]byte(response))
 }

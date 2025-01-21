@@ -7,12 +7,12 @@ import (
 )
 
 type InMemoryStore struct {
-	Lists    map[int]List
+	Lists    map[string]List
 	filePath string
 }
 
 func NewMemStore() *InMemoryStore {
-	list := make(map[int]List)
+	list := make(map[string]List)
 	return &InMemoryStore{
 		Lists:    list,
 		filePath: "data.json",
@@ -25,28 +25,28 @@ func (s *InMemoryStore) AddList(list List) {
 	fmt.Println(s.Lists)
 }
 
-func (s *InMemoryStore) AddTask(id int, task Task) {
+func (s *InMemoryStore) AddTask(id string, task Task) {
 	lists := s.Lists[id]
 	task.Id = len(lists.Tasks) + 1
 	lists.Tasks = append(lists.Tasks, task)
 	s.Lists[id] = lists
 }
 
-func (s *InMemoryStore) GetAllLists() map[int]List {
+func (s *InMemoryStore) GetAllLists() map[string]List {
 	return s.Lists
 }
 
-func (s *InMemoryStore) GetList(id int) List {
+func (s *InMemoryStore) GetList(id string) List {
 	return s.Lists[id]
 }
 
-func (s *InMemoryStore) CompleteTask(listId int, taskId int, isCompleted bool) {
+func (s *InMemoryStore) CompleteTask(listId string, taskId int, isCompleted bool) {
 	list := s.Lists[listId]
 	list.Tasks[taskId-1].Complete = isCompleted
 	s.Lists[listId] = list
 }
 
-func (s *InMemoryStore) DeleteList(id int) {
+func (s *InMemoryStore) DeleteList(id string) {
 	delete(s.Lists, id)
 }
 

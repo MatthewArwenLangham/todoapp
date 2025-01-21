@@ -2,15 +2,15 @@ package store
 
 type Store interface {
 	AddList(list List)
-	AddTask(id int, task Task)
-	GetList(id int) List
-	GetAllLists() map[int]List
-	CompleteTask(listId int, taskInt int, isCompleted bool)
-	DeleteList(id int)
+	AddTask(id string, task Task)
+	GetList(id string) List
+	GetAllLists() map[string]List
+	CompleteTask(listId string, taskInt int, isCompleted bool)
+	DeleteList(id string)
 }
 
 type List struct {
-	Id    int    `json:"id"`
+	Id    string `json:"id"`
 	Name  string `json:"name"`
 	Tasks []Task `json:"tasks"`
 }
