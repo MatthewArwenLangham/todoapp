@@ -63,7 +63,6 @@ func (h *ToDoHandler) ViewList(w http.ResponseWriter, r *http.Request) {
 func (h *ToDoHandler) ViewLists(w http.ResponseWriter, r *http.Request) {
 	lists := h.store.GetAllLists()
 	response := fmt.Sprintf("%v\n", lists)
-	fmt.Println(response)
 	w.Write([]byte(response))
 }
 
@@ -72,7 +71,7 @@ func (h *ToDoHandler) AddList(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(id)
+
 	newList := store.List{
 		Id:    id,
 		Name:  r.FormValue("name"),

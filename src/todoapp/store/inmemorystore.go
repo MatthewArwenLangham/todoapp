@@ -20,9 +20,7 @@ func NewMemStore() *InMemoryStore {
 }
 
 func (s *InMemoryStore) AddList(list List) {
-	fmt.Println(list.Id)
 	s.Lists[list.Id] = list
-	fmt.Println(s.Lists)
 }
 
 func (s *InMemoryStore) AddTask(id string, task Task) {
