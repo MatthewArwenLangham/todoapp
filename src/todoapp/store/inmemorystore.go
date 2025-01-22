@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sync"
 )
 
 type InMemoryStore struct {
 	Lists    map[string]List
 	filePath string
+	mu       sync.Mutex
 }
 
 func NewMemStore() *InMemoryStore {
@@ -49,6 +51,9 @@ func (s *InMemoryStore) DeleteList(id string) {
 }
 
 func (s *InMemoryStore) LoadFromFile() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	file, err := os.Open(s.filePath)
 	if err != nil {
 		fmt.Println("Error opening file:", err)
@@ -69,6 +74,9 @@ func (s *InMemoryStore) LoadFromFile() {
 }
 
 func (s *InMemoryStore) SaveToFile() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	file, err := os.Create(s.filePath)
 	if err != nil {
 		panic(err)
