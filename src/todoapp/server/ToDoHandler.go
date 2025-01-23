@@ -22,8 +22,9 @@ func NewToDoHandler(s store.Store) *ToDoHandler {
 }
 
 var (
-	ToDoRe       = regexp.MustCompile(`^/lists/*$`)
-	ToDoReWithID = regexp.MustCompile(`^/lists/[a-zA-Z0-9]+$`)
+	//Switch this to parameters???
+	ToDoRe       = regexp.MustCompile(`^/api/v1/lists/*$`)
+	ToDoReWithID = regexp.MustCompile(`^/api/v1/lists/[a-zA-Z0-9]+$`)
 )
 
 func (h *ToDoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -55,7 +56,7 @@ func (h *ToDoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *ToDoHandler) ViewList(w http.ResponseWriter, r *http.Request) {
-	id := strings.Split(r.URL.Path, "lists/")[1]
+	id := strings.Split(r.URL.Path, "/api/v1/lists/")[1]
 	response := fmt.Sprintf("%v\n", h.store.GetList(id))
 	w.Write([]byte(response))
 }
@@ -90,9 +91,9 @@ func (h *ToDoHandler) AddTask(w http.ResponseWriter, r *http.Request) {
 		Complete: false,
 	}
 
-	id := strings.Split(r.URL.Path, "lists/")[1]
+	id := strings.Split(r.URL.Path, "/api/v1/lists/")[1]
 
-	h.store.AddTask(id, newTask)
+	go h.store.AddTask(id, newTask)
 	response := fmt.Sprintf("%v successfully added.\n", newTask)
 	w.Write([]byte(response))
 }
@@ -112,12 +113,12 @@ func (h *ToDoHandler) CompleteTask(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	h.store.CompleteTask(listId, int(taskIdInt), isTaskCompleted)
+	go h.store.CompleteTask(listId, int(taskIdInt), isTaskCompleted)
 }
 
 func (h *ToDoHandler) DeleteList(w http.ResponseWriter, r *http.Request) {
-	listId := strings.Split(r.URL.Path, "lists/")[1]
-	h.store.DeleteList(listId)
+	listId := strings.Split(r.URL.Path, "/api/v1/lists/")[1]
+	go h.store.DeleteList(listId)
 	response := fmt.Sprintf("List with ID %v successfully removed.\n", listId)
 	w.Write([]byte(response))
 }
