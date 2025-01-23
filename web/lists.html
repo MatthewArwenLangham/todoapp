@@ -5,11 +5,17 @@
     <h1>Lists!!! Look at all the beautiful lists!!! Oh wow. So much list</h1>
     <div>
         {{range .}}
-        <li>
-            {{.Name}}
-        </li>
+        <li id={{.Id}} onClick="goToList(this)">{{.Name}}</li>
         {{end}}
     </div>
 </body>
 {{template "footer"}}
 </html>
+
+<script>
+        function goToList(element) {
+            const text = element.id;
+            const encodedText = encodeURIComponent(text);
+            window.location.href = `/lists/${encodedText}`;
+        }
+</script>
