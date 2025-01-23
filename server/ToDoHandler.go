@@ -25,7 +25,7 @@ func NewToDoHandler(s store.Store) *ToDoHandler {
 var (
 	//Switch this to parameters???
 	ToDoRe       = regexp.MustCompile(`^/api/v1/lists/*$`)
-	ToDoReWithID = regexp.MustCompile(`^/api/v1/lists/[a-zA-Z0-9]+$`)
+	ToDoReWithID = regexp.MustCompile(`^/api/v1/lists/[a-zA-Z0-9_-]+$`)
 )
 
 func (h *ToDoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -100,7 +100,6 @@ func (h *ToDoHandler) AddTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := strings.Split(r.URL.Path, "/api/v1/lists/")[1]
-
 	go h.store.AddTask(id, newTask)
 	response := fmt.Sprintf("%v successfully added.\n", newTask)
 	w.Write([]byte(response))
