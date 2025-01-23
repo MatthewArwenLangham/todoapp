@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"regexp"
@@ -57,14 +58,17 @@ func (h *ToDoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (h *ToDoHandler) ViewList(w http.ResponseWriter, r *http.Request) {
 	id := strings.Split(r.URL.Path, "/api/v1/lists/")[1]
-	response := fmt.Sprintf("%v\n", h.store.GetList(id))
-	w.Write([]byte(response))
+	response := h.store.GetList(id)
+	jsonData, _ := json.Marshal(response)
+	r.Header.Set("Content-Type", "application/json")
+	w.Write(jsonData)
 }
 
 func (h *ToDoHandler) ViewLists(w http.ResponseWriter, r *http.Request) {
 	lists := h.store.GetAllLists()
-	response := fmt.Sprintf("%v\n", lists)
-	w.Write([]byte(response))
+	jsonData, _ := json.Marshal(lists)
+	r.Header.Set("Content-Type", "application/json")
+	w.Write(jsonData)
 }
 
 func (h *ToDoHandler) AddList(w http.ResponseWriter, r *http.Request) {
@@ -79,7 +83,7 @@ func (h *ToDoHandler) AddList(w http.ResponseWriter, r *http.Request) {
 		Tasks: []store.Task{},
 	}
 
-	h.store.AddList(newList)
+	go h.store.AddList(newList)
 	response := fmt.Sprintf("%s successfully added.", newList.Name)
 	w.Write([]byte(response))
 }
