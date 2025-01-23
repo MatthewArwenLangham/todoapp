@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+//Bug to fix with delete...
+
 type db struct {
 	lists []list `json:"lists"`
 }
@@ -207,7 +209,11 @@ func deleteTask(reader *bufio.Reader, list *list) {
 	}
 
 	if intSelection > 0 && intSelection <= int64(len(list.tasks)) {
-		list.tasks = append(list.tasks[:intSelection], list.tasks[intSelection+1:]...)
+		if len(list.tasks) > 1 {
+			list.tasks = append(list.tasks[:intSelection-1], list.tasks[intSelection:]...)
+		} else {
+			list.tasks = nil
+		}
 	} else {
 		fmt.Println(intSelection, "is not a valid number.")
 	}

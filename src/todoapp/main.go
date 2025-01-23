@@ -2,10 +2,12 @@ package main
 
 import (
 	"flag"
+	"net/http"
 
 	"github.com/MatthewArwenLangham/todoapp/cli"
 	"github.com/MatthewArwenLangham/todoapp/server"
 	"github.com/MatthewArwenLangham/todoapp/store"
+	"github.com/MatthewArwenLangham/todoapp/web"
 )
 
 func main() {
@@ -17,8 +19,9 @@ func main() {
 		cli.Run()
 		return
 	}
-
+	mux := http.NewServeMux()
+	web.Start(mux)
 	store := store.NewMemStore()
 	store.LoadFromFile()
-	server.Start(store)
+	server.Start(mux, store)
 }

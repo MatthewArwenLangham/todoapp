@@ -26,6 +26,8 @@ func (s *InMemoryStore) AddList(list List) {
 }
 
 func (s *InMemoryStore) AddTask(id string, task Task) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	lists := s.Lists[id]
 	task.Id = len(lists.Tasks) + 1
 	lists.Tasks = append(lists.Tasks, task)
@@ -41,12 +43,17 @@ func (s *InMemoryStore) GetList(id string) List {
 }
 
 func (s *InMemoryStore) CompleteTask(listId string, taskId int, isCompleted bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	list := s.Lists[listId]
 	list.Tasks[taskId-1].Complete = isCompleted
 	s.Lists[listId] = list
 }
 
 func (s *InMemoryStore) DeleteList(id string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	delete(s.Lists, id)
 }
 
