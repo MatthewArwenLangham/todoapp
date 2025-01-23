@@ -65,13 +65,17 @@ func (h *ToDoHandler) ViewList(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *ToDoHandler) ViewLists(w http.ResponseWriter, r *http.Request) {
-	lists := h.store.GetAllLists()
+	lists := h.getAllLists()
 	jsonData, _ := json.Marshal(lists)
 	r.Header.Set("Content-Type", "application/json")
 	w.Write(jsonData)
 }
 
 func (h *ToDoHandler) AddList(w http.ResponseWriter, r *http.Request) {
+	if r.FormValue("name") == "" {
+		return
+	}
+
 	id, err := shortid.Generate()
 	if err != nil {
 		panic(err)
@@ -125,4 +129,41 @@ func (h *ToDoHandler) DeleteList(w http.ResponseWriter, r *http.Request) {
 	go h.store.DeleteList(listId)
 	response := fmt.Sprintf("List with ID %v successfully removed.\n", listId)
 	w.Write([]byte(response))
+}
+
+// actor model
+type operation struct {
+	action       string
+	responseChan chan map[string]store.List
+}
+
+var bufferChan = make(chan operation, 100)
+
+func (h *ToDoHandler) getAllLists() map[string]store.List {
+	responseChan := make(chan map[string]store.List, 1)
+	op := operation{
+		action:       "getAll",
+		responseChan: responseChan,
+	}
+	bufferChan <- op
+	lists, ok := <-responseChan
+	if !ok {
+		fmt.Println("Closed")
+	}
+	return lists
+}
+
+func (h *ToDoHandler) actor() {
+	for op := range bufferChan {
+		switch op.action {
+		case "getAll":
+			lists := h.store.GetAllLists()
+			if len(lists) > 0 {
+				op.responseChan <- lists
+			}
+		default:
+			fmt.Println("You shouldn't see me... stop looking.")
+		}
+		close(op.responseChan)
+	}
 }

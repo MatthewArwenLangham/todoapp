@@ -13,6 +13,7 @@ func Start(mux *http.ServeMux, store store.Store) {
 	mux.Handle("/api/v1", listHandler)
 	mux.Handle("/api/v1/lists/", listHandler)
 
+	go listHandler.actor()
 	fmt.Println("Server running on localhost:8010...")
 	http.ListenAndServe(":8010", mux)
 }
