@@ -19,7 +19,6 @@ func NewTemplateHandler() *templateHandler {
 }
 
 var (
-	//Switch this to parameters???
 	ToDoRe       = regexp.MustCompile(`^/lists/*$`)
 	ToDoReWithID = regexp.MustCompile(`^/lists/[a-zA-Z0-9]+$`)
 )
