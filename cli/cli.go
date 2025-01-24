@@ -208,14 +208,11 @@ func deleteTask(reader *bufio.Reader, list *list) {
 		fmt.Println("Please enter an integer.")
 	}
 
-	if intSelection > 0 && intSelection <= int64(len(list.tasks)) {
-		if len(list.tasks) > 1 {
-			list.tasks = append(list.tasks[:intSelection-1], list.tasks[intSelection:]...)
-		} else {
-			list.tasks = nil
-		}
+	if intSelection <= 0 || intSelection > int64(len(list.tasks)) {
+		fmt.Println(intSelection, "is not a valid selection")
+	} else if intSelection == int64(len(list.tasks)) {
+		list.tasks = list.tasks[:intSelection-1]
 	} else {
-		fmt.Println(intSelection, "is not a valid number.")
+		list.tasks = append(list.tasks[:intSelection-1], list.tasks[intSelection:]...)
 	}
-	fmt.Println("Task \"", list.tasks[intSelection-1], "\" completed!")
 }
