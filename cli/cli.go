@@ -8,8 +8,6 @@ import (
 	"strings"
 )
 
-//Bug to fix with delete...
-
 type db struct {
 	lists []list `json:"lists"`
 }
