@@ -59,6 +59,10 @@ func (h *ToDoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (h *ToDoHandler) ViewList(w http.ResponseWriter, r *http.Request) {
 	id := strings.Split(r.URL.Path, "/api/v1/lists/")[1]
 	response := h.store.GetList(id)
+	if response.Id == "" {
+		w.Write([]byte("No such list"))
+		return
+	}
 	jsonData, _ := json.Marshal(response)
 	r.Header.Set("Content-Type", "application/json")
 	w.Write(jsonData)
@@ -125,8 +129,14 @@ func (h *ToDoHandler) CompleteTask(w http.ResponseWriter, r *http.Request) {
 
 func (h *ToDoHandler) DeleteList(w http.ResponseWriter, r *http.Request) {
 	listId := strings.Split(r.URL.Path, "/api/v1/lists/")[1]
-	go h.store.DeleteList(listId)
-	response := fmt.Sprintf("List with ID %v successfully removed.\n", listId)
+	list := h.store.GetList(listId)
+	response := ""
+	if list.Id == "" {
+		response = fmt.Sprintf("List with ID %v does not exist.\n", listId)
+	} else {
+		go h.store.DeleteList(listId)
+		response = fmt.Sprintf("List with ID %v successfully removed.\n", listId)
+	}
 	w.Write([]byte(response))
 }
 

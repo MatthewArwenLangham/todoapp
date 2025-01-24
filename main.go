@@ -22,6 +22,6 @@ func main() {
 	mux := http.NewServeMux()
 	web.Start(mux)
 	store := store.NewMemStore()
-	store.LoadFromFile()
+	go store.LoadFromFile()
 	server.Start(mux, store)
 }
