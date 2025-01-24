@@ -88,7 +88,7 @@ func (h *ToDoHandler) AddList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	go h.store.AddList(newList)
-	response := fmt.Sprintf("%s successfully added.", newList.Name)
+	response := fmt.Sprintf("%s successfully added with id: %s.", newList.Name, id)
 	w.Write([]byte(response))
 }
 
@@ -111,13 +111,13 @@ func (h *ToDoHandler) CompleteTask(w http.ResponseWriter, r *http.Request) {
 	taskId := r.FormValue("taskId")
 	taskIdInt, err := strconv.ParseInt(taskId, 10, 0)
 	if err != nil {
-		w.Write([]byte("Invalid id"))
+		w.Write([]byte("Invalid taskId"))
 	}
 
 	completed := r.FormValue("completed")
 	isTaskCompleted, err := strconv.ParseBool(completed)
 	if err != nil {
-		panic(err)
+		w.Write([]byte("Invalid completed bool"))
 	}
 
 	go h.store.CompleteTask(listId, int(taskIdInt), isTaskCompleted)
