@@ -55,6 +55,7 @@ func (s *InMemoryStore) DeleteList(id string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	delete(s.Lists, id)
+	// go s.SaveToFile()
 }
 
 func (s *InMemoryStore) LoadFromFile() {
@@ -84,12 +85,18 @@ func (s *InMemoryStore) SaveToFile() {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	file, err := os.Create(s.filePath)
-	if err != nil {
-		panic(err)
+	var lists []List
+	for _, list := range s.Lists {
+		lists = append(lists, list)
 	}
-	defer file.Close()
 
-	data, _ := json.MarshalIndent(s.Lists, "", "  ")
-	os.WriteFile(s.filePath, data, 0644)
+	data, err := json.MarshalIndent(lists, "", " ")
+	if err != nil {
+		fmt.Println("Error marshaling JSON:", err)
+		return
+	}
+
+	if err := os.WriteFile(s.filePath, data, 0644); err != nil {
+		fmt.Println("Error writing to file:", err)
+	}
 }
